@@ -53,6 +53,10 @@
                         // A comment goes until the end of the line.
                         while (Peek() != '\n' && !IsAtEnd()) Advance();
                     }
+                    else if (Match('*'))
+                    {
+                        SkipMultilineComment();
+                    }
                     else
                     {
                         AddToken(TokenType.SLASH);
@@ -77,6 +81,27 @@
                         Lox.Error(_line, "Unexpected character.");
                     }
                     break;
+            }
+        }
+
+        private void SkipMultilineComment()
+        {
+            int nesting = 1;
+            while (!IsAtEnd() && nesting > 0)
+            {
+                if (Peek() == '/' && PeekNext() == '*')
+                {
+                    nesting++;
+                    Advance();
+                    Advance();
+                }
+                else if (Peek() == '*' && PeekNext() == '/')
+                {
+                    nesting--;
+                    Advance();
+                    Advance();
+                }
+                else Advance();
             }
         }
 
