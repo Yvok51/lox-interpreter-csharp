@@ -56,6 +56,9 @@
                 case TokenType.STAR:
                     CheckNumberOperands(visitee.Op, left, right); 
                     return (double)left! * (double)right!;
+                case TokenType.COMMA:
+                    Evaluate(visitee.Left);
+                    return Evaluate(visitee.Right);
             }
 
             // Unreachable.
