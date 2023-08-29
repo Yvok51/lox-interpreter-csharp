@@ -21,13 +21,18 @@ namespace LoxInterpreter
 
         public string Visit(LiteralExpr visitee)
         {
-            if (visitee.Value == null) return "nil";
-            return visitee.Value.ToString();
+            if (visitee.Value is null) return "nil";
+            return visitee.Value.ToString()!;
         }
 
         public string Visit(GroupingExpr visitee)
         {
             return Parenthesize("group", visitee.Expression);
+        }
+
+        public string Visit(TernaryConditionExpr visitee)
+        {
+            return Parenthesize("?:", visitee.Condition, visitee.TrueExpr, visitee.FalseExpr);
         }
 
         private string Parenthesize(string name, params Expr[] exprs)

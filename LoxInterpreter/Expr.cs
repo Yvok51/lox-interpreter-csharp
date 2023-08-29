@@ -6,6 +6,7 @@ namespace LoxInterpreter
      T Visit(UnaryExpr visitee);
      T Visit(LiteralExpr visitee);
      T Visit(GroupingExpr visitee);
+     T Visit(TernaryConditionExpr visitee);
   }
 
   internal abstract class Expr
@@ -60,6 +61,22 @@ namespace LoxInterpreter
       public GroupingExpr(Expr expression)
       {
          Expression = expression;
+      }
+     public override T Accept<T>(IExprVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class TernaryConditionExpr : Expr
+  {
+      public Expr Condition { get; }
+      public Expr TrueExpr { get; }
+      public Expr FalseExpr { get; }
+      public TernaryConditionExpr(Expr condition, Expr trueexpr, Expr falseexpr)
+      {
+         Condition = condition;
+         TrueExpr = trueexpr;
+         FalseExpr = falseexpr;
       }
      public override T Accept<T>(IExprVisitor<T> visitor)
       {

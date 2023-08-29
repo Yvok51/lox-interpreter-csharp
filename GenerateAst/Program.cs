@@ -19,6 +19,7 @@ namespace GenerateAst
                 ("UnaryExpr", new() { ("Expr", "Right"), ("Token", "Op") }),
                 ("LiteralExpr", new() { ("object?", "Value") }),
                 ("GroupingExpr", new() { ("Expr", "Expression") }),
+                ("TernaryConditionExpr", new() { ("Expr", "Condition"), ("Expr", "TrueExpr"), ("Expr", "FalseExpr") })
             });
             var exprFile = outputDir + "/" + "Expr.cs";
             File.WriteAllText(exprFile, exprOutput);

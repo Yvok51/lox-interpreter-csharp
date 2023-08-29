@@ -58,11 +58,11 @@
         {
             if (token.Type == TokenType.EOF)
             {
-                Report(token.Line, " at end", message);
+                Report(token.Line, "at end", message);
             }
             else
             {
-                Report(token.Line, $" at '{token.Lexeme}'", message);
+                Report(token.Line, $"at '{token.Lexeme}'", message);
             }
         }
 

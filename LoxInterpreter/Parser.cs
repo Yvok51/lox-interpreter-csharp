@@ -1,8 +1,4 @@
-﻿using System.Security.Claims;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace LoxInterpreter
+﻿namespace LoxInterpreter
 {
     internal class Parser
     {
@@ -15,7 +11,7 @@ namespace LoxInterpreter
         {
             try
             {
-                return Expression();
+                return ExpressionList();
             }
             catch (ParseError)
             {
@@ -23,22 +19,42 @@ namespace LoxInterpreter
             }
         }
 
+        private Expr ExpressionList() =>
+            LeftAssocBinaryWithLeadingCheck(Expression, TokenType.COMMA);
+
         private Expr Expression()
         {
-            return Equality();
+            return TernaryConditional();
+        }
+
+        private Expr TernaryConditional()
+        {
+            var condition = Equality();
+            if (Match(TokenType.QUESTION_MARK))
+            {
+                var trueExpr = ExpressionList();
+                if (Match(TokenType.COLON))
+                {
+                    var falseExpr = TernaryConditional();
+                    return new TernaryConditionExpr(condition, trueExpr, falseExpr);
+                }
+                throw Error(Peek(), "Expect ternary condition");
+            }
+
+            return condition;
         }
 
         private Expr Equality() =>
-            LeftAssocBinary(Comparison, TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL);
+            LeftAssocBinaryWithLeadingCheck(Comparison, TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL);
 
         private Expr Comparison() =>
-            LeftAssocBinary(Term, TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL);
+            LeftAssocBinaryWithLeadingCheck(Term, TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL);
 
         private Expr Term() =>
             LeftAssocBinary(Factor, TokenType.MINUS, TokenType.PLUS);
 
         private Expr Factor() =>
-            LeftAssocBinary(Unary, TokenType.STAR, TokenType.SLASH);
+            LeftAssocBinaryWithLeadingCheck(Unary, TokenType.STAR, TokenType.SLASH);
 
         private Expr Unary()
         {
@@ -71,6 +87,16 @@ namespace LoxInterpreter
             }
 
             throw Error(Peek(), "Expect expression.");
+        }
+
+        private Expr LeftAssocBinaryWithLeadingCheck(Func<Expr> operand, params TokenType[] operators)
+        {
+            if (Match(operators))
+            {
+                throw Error(Previous(), $"Binary operator '{Previous().Lexeme}' without left operand.");
+            }
+
+            return LeftAssocBinary(operand, operators);
         }
 
         private Expr LeftAssocBinary(Func<Expr> operand, params TokenType[] operators)
