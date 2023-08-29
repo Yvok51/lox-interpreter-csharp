@@ -2,6 +2,8 @@
 {
     internal class Interpreter : IExprVisitor<object?>, IStmtVisitor<object?>
     {
+        private Environment environment = new Environment();
+
         public void Interpret(List<Stmt> statements)
         {
             try
@@ -17,6 +19,18 @@
             }
         }
 
+        public object? Visit(VarStmt visitee)
+        {
+            object? value = null;
+            if (visitee.Initializer is not null)
+            {
+                value = Evaluate(visitee.Initializer);
+            }
+
+            environment.Define(visitee.Name.Lexeme, value);
+            return null;
+        }
+
         public object? Visit(ExpressionStmt visitee)
         {
             Evaluate(visitee.Expression);
@@ -28,6 +42,13 @@
             var val = Evaluate(visitee.Expression);
             Console.WriteLine(Stringify(val));
             return null;
+        }
+
+        public object? Visit(AssignExpr visitee)
+        {
+            object? value = Evaluate(visitee.Value);
+            environment.Assign(visitee.Name, value);
+            return value;
         }
 
         public object? Visit(BinaryExpr visitee)
@@ -99,6 +120,11 @@
         public object? Visit(LiteralExpr visitee)
         {
             return visitee.Value;
+        }
+
+        public object? Visit(VariableExpr visitee)
+        {
+            return environment.Get(visitee.Name);
         }
 
         public object? Visit(GroupingExpr visitee)

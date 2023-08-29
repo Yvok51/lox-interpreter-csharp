@@ -10,18 +10,40 @@
         public List<Stmt> Parse()
         {
             List<Stmt> statements = new();
+            while (!IsAtEnd())
+            {
+                statements.Add(Declaration());
+            }
+            return statements;
+        }
+
+        private Stmt Declaration()
+        {
             try
             {
-                while (!IsAtEnd())
-                {
-                    statements.Add(Statement());
-                }
-                return statements;
+                if (Match(TokenType.VAR)) return VarDeclaration();
+
+                return Statement();
             }
             catch (ParseError)
             {
-                return statements;
+                Synchronize();
+                return null;
             }
+        }
+
+        private Stmt VarDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+            Expr initializer = null;
+            if (Match(TokenType.EQUAL))
+            {
+                initializer = ExpressionList();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+            return new VarStmt(name, initializer);
         }
 
         private Stmt Statement()
@@ -50,7 +72,27 @@
 
         private Expr Expression()
         {
-            return TernaryConditional();
+            return Assignment();
+        }
+
+        private Expr Assignment()
+        {
+            Expr expr = TernaryConditional();
+
+            if (Match(TokenType.EQUAL))
+            {
+                Token equals = Previous();
+                Expr value = Assignment();
+
+                if (expr is VariableExpr varExpr) {
+                    Token name = varExpr.Name;
+                    return new AssignExpr(name, value);
+                }
+
+                Error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
         }
 
         private Expr TernaryConditional()
@@ -103,6 +145,11 @@
             if (Match(TokenType.NUMBER, TokenType.STRING))
             {
                 return new LiteralExpr(Previous().Literal);
+            }
+
+            if (Match(TokenType.IDENTIFIER))
+            {
+                return new VariableExpr(Previous());
             }
 
             if (Match(TokenType.LEFT_PAREN))

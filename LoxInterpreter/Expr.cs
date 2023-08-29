@@ -7,6 +7,8 @@ namespace LoxInterpreter
      T Visit(LiteralExpr visitee);
      T Visit(GroupingExpr visitee);
      T Visit(TernaryConditionExpr visitee);
+     T Visit(VariableExpr visitee);
+     T Visit(AssignExpr visitee);
   }
 
   internal abstract class Expr
@@ -77,6 +79,32 @@ namespace LoxInterpreter
          Condition = condition;
          TrueExpr = trueexpr;
          FalseExpr = falseexpr;
+      }
+     public override T Accept<T>(IExprVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class VariableExpr : Expr
+  {
+      public Token Name { get; }
+      public VariableExpr(Token name)
+      {
+         Name = name;
+      }
+     public override T Accept<T>(IExprVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class AssignExpr : Expr
+  {
+      public Token Name { get; }
+      public Expr Value { get; }
+      public AssignExpr(Token name, Expr value)
+      {
+         Name = name;
+         Value = value;
       }
      public override T Accept<T>(IExprVisitor<T> visitor)
       {

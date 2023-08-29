@@ -35,6 +35,16 @@ namespace LoxInterpreter
             return Parenthesize("?:", visitee.Condition, visitee.TrueExpr, visitee.FalseExpr);
         }
 
+        public string Visit(VariableExpr visitee)
+        {
+            return Parenthesize("var " + visitee.Name.Lexeme);
+        }
+
+        public string Visit(AssignExpr visitee)
+        {
+            return Parenthesize(visitee.Name.Lexeme + " =", visitee.Value);
+        }
+
         private string Parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder builder = new StringBuilder();

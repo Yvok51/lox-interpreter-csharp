@@ -20,6 +20,8 @@ namespace GenerateAst
                 ("LiteralExpr", new() { ("object?", "Value") }),
                 ("GroupingExpr", new() { ("Expr", "Expression") }),
                 ("TernaryConditionExpr", new() { ("Expr", "Condition"), ("Expr", "TrueExpr"), ("Expr", "FalseExpr") }),
+                ("VariableExpr", new() { ("Token", "Name") }),
+                ("AssignExpr", new() { ("Token", "Name"), ("Expr", "Value") }),
             });
             var exprFile = outputDir + "/" + "Expr.cs";
             File.WriteAllText(exprFile, exprCode);
@@ -28,6 +30,7 @@ namespace GenerateAst
             {
                 ("ExpressionStmt", new() { ("Expr", "Expression") }),
                 ("PrintStmt", new() { ("Expr", "Expression") }),
+                ("VarStmt", new() { ("Token", "Name"), ("Expr?", "Initializer") }),
             });
             var stmtFile = outputDir + "/" + "Stmt.cs";
             File.WriteAllText(stmtFile, stmtCode);

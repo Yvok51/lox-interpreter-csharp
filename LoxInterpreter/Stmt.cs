@@ -4,6 +4,7 @@ namespace LoxInterpreter
   {
      T Visit(ExpressionStmt visitee);
      T Visit(PrintStmt visitee);
+     T Visit(VarStmt visitee);
   }
 
   internal abstract class Stmt
@@ -28,6 +29,20 @@ namespace LoxInterpreter
       public PrintStmt(Expr expression)
       {
          Expression = expression;
+      }
+     public override T Accept<T>(IStmtVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class VarStmt : Stmt
+  {
+      public Token Name { get; }
+      public Expr? Initializer { get; }
+      public VarStmt(Token name, Expr? initializer)
+      {
+         Name = name;
+         Initializer = initializer;
       }
      public override T Accept<T>(IStmtVisitor<T> visitor)
       {
