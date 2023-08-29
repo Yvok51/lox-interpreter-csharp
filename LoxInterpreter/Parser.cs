@@ -7,16 +7,42 @@
             _tokens = tokens;
         }
 
-        public Expr? Parse()
+        public List<Stmt> Parse()
         {
+            List<Stmt> statements = new();
             try
             {
-                return ExpressionList();
+                while (!IsAtEnd())
+                {
+                    statements.Add(Statement());
+                }
+                return statements;
             }
             catch (ParseError)
             {
-                return null;
+                return statements;
             }
+        }
+
+        private Stmt Statement()
+        {
+            if (Match(TokenType.PRINT)) return PrintStatement();
+
+            return ExpressionStatement();
+        }
+
+        private Stmt PrintStatement()
+        {
+            Expr expr = ExpressionList();
+            Consume(TokenType.SEMICOLON, "Expect ';' after value.");
+            return new PrintStmt(expr);
+        }
+
+        private Stmt ExpressionStatement()
+        {
+            Expr expr = ExpressionList();
+            Consume(TokenType.SEMICOLON, "Expect ';' after value.");
+            return new ExpressionStmt(expr);
         }
 
         private Expr ExpressionList() =>

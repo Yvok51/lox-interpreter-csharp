@@ -13,16 +13,24 @@ namespace GenerateAst
             }
 
             var outputDir = args[0];
-            var exprOutput = DefineAst("Expr", new()
+            var exprCode = DefineAst("Expr", new()
             {
                 ("BinaryExpr", new() { ("Expr", "Left"), ("Expr", "Right"), ("Token", "Op") }),
                 ("UnaryExpr", new() { ("Expr", "Right"), ("Token", "Op") }),
                 ("LiteralExpr", new() { ("object?", "Value") }),
                 ("GroupingExpr", new() { ("Expr", "Expression") }),
-                ("TernaryConditionExpr", new() { ("Expr", "Condition"), ("Expr", "TrueExpr"), ("Expr", "FalseExpr") })
+                ("TernaryConditionExpr", new() { ("Expr", "Condition"), ("Expr", "TrueExpr"), ("Expr", "FalseExpr") }),
             });
             var exprFile = outputDir + "/" + "Expr.cs";
-            File.WriteAllText(exprFile, exprOutput);
+            File.WriteAllText(exprFile, exprCode);
+
+            var stmtCode = DefineAst("Stmt", new()
+            {
+                ("ExpressionStmt", new() { ("Expr", "Expression") }),
+                ("PrintStmt", new() { ("Expr", "Expression") }),
+            });
+            var stmtFile = outputDir + "/" + "Stmt.cs";
+            File.WriteAllText(stmtFile, stmtCode);
 
             return 0;
         }

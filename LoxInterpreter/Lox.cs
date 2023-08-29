@@ -47,10 +47,10 @@ namespace LoxInterpreter
             var scanner = new Scanner(code);
             var tokens = scanner.ScanTokens();
             var parser = new Parser(tokens);
-            var expr = parser.Parse();
+            var statements = parser.Parse();
 
-            if (_hadError || expr is null) return;
-            interpreter.Interpret(expr);
+            if (_hadError) return;
+            interpreter.Interpret(statements);
         }
 
         public static void Error(int line, string message)

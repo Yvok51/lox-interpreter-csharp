@@ -1,17 +1,33 @@
 ﻿namespace LoxInterpreter
 {
-    internal class Interpreter : IExprVisitor<object?>
+    internal class Interpreter : IExprVisitor<object?>, IStmtVisitor<object?>
     {
-        public void Interpret(Expr expression)
+        public void Interpret(List<Stmt> statements)
         {
             try
             {
-                Console.WriteLine(Stringify(Evaluate(expression)));
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
             }
             catch (RuntimeError e)
             {
                 Lox.RuntimeError(e);
             }
+        }
+
+        public object? Visit(ExpressionStmt visitee)
+        {
+            Evaluate(visitee.Expression);
+            return null;
+        }
+
+        public object? Visit(PrintStmt visitee)
+        {
+            var val = Evaluate(visitee.Expression);
+            Console.WriteLine(Stringify(val));
+            return null;
         }
 
         public object? Visit(BinaryExpr visitee)
@@ -99,6 +115,11 @@
         private object? Evaluate(Expr expr)
         {
             return expr.Accept(this);
+        }
+
+        private void Execute(Stmt stmt)
+        {
+            stmt.Accept(this);
         }
 
         private string Stringify(object? value)
