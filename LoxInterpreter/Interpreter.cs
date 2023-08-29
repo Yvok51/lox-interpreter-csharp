@@ -42,12 +42,16 @@
                         return dLeft + dRight;
                     }
 
-                    if (left is string sLeft && right is string sRight) {
-                        return sLeft + sRight;
+                    if (left is string || right is string) {
+                        return Stringify(left) + Stringify(right);
                     }
                     throw new RuntimeError(visitee.Op, "Operands must be two numbers or two strings.");
                 case TokenType.SLASH:
                     CheckNumberOperands(visitee.Op, left, right);
+                    if ((double)right! == 0)
+                    {
+                        throw new RuntimeError(visitee.Op, "Division by zero.");
+                    }
                     return (double)left! / (double)right!;
                 case TokenType.STAR:
                     CheckNumberOperands(visitee.Op, left, right); 

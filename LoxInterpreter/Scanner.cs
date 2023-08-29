@@ -124,7 +124,7 @@ namespace LoxInterpreter
             }
 
             Advance(); // Closing "
-            var value = _source.Substring(_start + 1, CurrentLength() - 1); // value inside quotes
+            var value = _source.Substring(_start + 1, CurrentLength() - 2); // value inside quotes
             AddToken(TokenType.STRING, value);
         }
 
