@@ -44,8 +44,8 @@ namespace LoxInterpreter
   }
   internal class LiteralExpr : Expr
   {
-      public object Value { get; }
-      public LiteralExpr(object value)
+      public object? Value { get; }
+      public LiteralExpr(object? value)
       {
          Value = value;
       }
