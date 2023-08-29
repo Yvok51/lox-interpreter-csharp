@@ -1,4 +1,6 @@
-﻿namespace LoxInterpreter
+﻿using System.Globalization;
+
+namespace LoxInterpreter
 {
     internal class Scanner
     {
@@ -134,7 +136,7 @@
                 Advance();
                 while (IsDigit(Peek())) Advance();
             }
-            var value = double.Parse(CurrentToken());
+            var value = double.Parse(CurrentToken(), Lox.Culture);
             AddToken(TokenType.NUMBER, value);
         }
 

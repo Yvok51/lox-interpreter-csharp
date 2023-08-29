@@ -1,4 +1,6 @@
-﻿namespace LoxInterpreter
+﻿using System.Globalization;
+
+namespace LoxInterpreter
 {
     internal class Lox
     {
@@ -20,10 +22,12 @@
 
         private static int RunFile(string path)
         {
-            var file = File.ReadAllText(path);
-            Run(file);
+            var code = File.ReadAllText(path);
+            Run(code);
 
-            return _hadError ? 65 : 0;
+            if (_hadError) return 65;
+            if (_hadRuntimeError) return 70;
+            return 0;
         }
 
         private static void RunPrompt()
@@ -38,15 +42,15 @@
             }
         }
 
-        private static void Run(string file)
+        private static void Run(string code)
         {
-            var scanner = new Scanner(file);
+            var scanner = new Scanner(code);
             var tokens = scanner.ScanTokens();
             var parser = new Parser(tokens);
             var expr = parser.Parse();
 
             if (_hadError || expr is null) return;
-            Console.WriteLine(new AstPrinter().Print(expr));
+            interpreter.Interpret(expr);
         }
 
         public static void Error(int line, string message)
@@ -66,12 +70,23 @@
             }
         }
 
+        public static void RuntimeError(RuntimeError error)
+        {
+            Console.Error.WriteLine($"{error.Message}\n[line {error.Token.Line}]");
+            _hadRuntimeError = true;
+        }
+
         private static void Report(int line, string where, string message)
         {
-            Console.WriteLine($"[line {line}] Error {where}: {message}");
+            Console.Error.WriteLine($"[line {line}] Error {where}: {message}");
             _hadError = true;
         }
 
+        public static readonly CultureInfo Culture = new CultureInfo("en-US");
+
+
         private static bool _hadError = false;
+        private static bool _hadRuntimeError = false;
+        private static readonly Interpreter interpreter = new();
     }
 }
