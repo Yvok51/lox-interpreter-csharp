@@ -4,6 +4,15 @@
     {
         private Environment environment = new Environment();
 
+        public object? Visit(WhileStmt visitee)
+        {
+            while (IsTruthy(Evaluate(visitee.Condition)))
+            {
+                Execute(visitee.Body);
+            }
+            return null;
+        }
+
         public object? Visit(IfStmt visitee)
         {
             if (IsTruthy(Evaluate(visitee.Condition)))

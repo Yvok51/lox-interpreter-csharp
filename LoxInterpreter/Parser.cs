@@ -51,8 +51,48 @@
             if (Match(TokenType.PRINT)) return PrintStatement();
             if (Match(TokenType.LEFT_BRACE)) return new BlockStmt(Block());
             if (Match(TokenType.IF)) return IfStatement();
+            if (Match(TokenType.WHILE)) return WhileStatement();
+            if (Match(TokenType.FOR)) return ForStatement();
 
             return ExpressionStatement();
+        }
+
+        private Stmt ForStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+            
+            Stmt? initializer;
+            if (Match(TokenType.SEMICOLON)) initializer = null;
+            else if (Match(TokenType.VAR)) initializer = VarDeclaration();
+            else initializer = ExpressionStatement();
+
+            Expr condition = new LiteralExpr(true); // default empty condition
+            if (!Check(TokenType.SEMICOLON)) condition = ExpressionList();
+            Consume(TokenType.SEMICOLON, "Expect ';' after loop condition");
+
+            Expr? increment = null;
+            if (!Check(TokenType.RIGHT_PAREN)) increment = ExpressionList();
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses");
+
+            Stmt body = Statement();
+
+            if (increment is not null)
+            {
+                body = new BlockStmt(new() { body, new ExpressionStmt(increment) });
+            }
+            var loop = new WhileStmt(condition, body);
+
+            return initializer is not null ? new BlockStmt(new() { initializer, loop }) : loop;
+        }
+
+        private Stmt WhileStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+            Expr condition = Expression();
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after while condition.");
+            Stmt body = Statement();
+
+            return new WhileStmt(condition, body);
         }
 
         private Stmt IfStatement()
