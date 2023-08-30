@@ -71,6 +71,21 @@
             return value;
         }
 
+        public object? Visit(LogicalExpr visitee)
+        {
+            var left = Evaluate(visitee.Left);
+            if (visitee.Op.Type == TokenType.OR)
+            {
+                if (IsTruthy(left)) return left;
+            }
+            else
+            {
+                if (!IsTruthy(left)) return left;
+            }
+
+            return Evaluate(visitee.Right);
+        }
+
         public object? Visit(BinaryExpr visitee)
         {
             var left = Evaluate(visitee.Left);

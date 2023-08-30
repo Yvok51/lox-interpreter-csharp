@@ -122,7 +122,7 @@
 
         private Expr TernaryConditional()
         {
-            var condition = Equality();
+            var condition = Or();
             if (Match(TokenType.QUESTION_MARK))
             {
                 var trueExpr = ExpressionList();
@@ -136,6 +136,12 @@
 
             return condition;
         }
+
+        private Expr Or() =>
+            LeftAssocBinaryWithLeadingCheck(And, TokenType.OR);
+
+        private Expr And() =>
+            LeftAssocBinaryWithLeadingCheck(Equality, TokenType.AND);
 
         private Expr Equality() =>
             LeftAssocBinaryWithLeadingCheck(Comparison, TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL);

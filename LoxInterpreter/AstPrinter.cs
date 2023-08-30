@@ -45,6 +45,11 @@ namespace LoxInterpreter
             return Parenthesize(visitee.Name.Lexeme + " =", visitee.Value);
         }
 
+        public string Visit(LogicalExpr visitee)
+        {
+            return Parenthesize(visitee.Op.Lexeme, visitee.Left, visitee.Right);
+        }
+
         private string Parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder builder = new StringBuilder();

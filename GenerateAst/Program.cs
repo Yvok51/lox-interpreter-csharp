@@ -18,6 +18,7 @@ namespace GenerateAst
                 ("BinaryExpr", new() { ("Expr", "Left"), ("Expr", "Right"), ("Token", "Op") }),
                 ("UnaryExpr", new() { ("Expr", "Right"), ("Token", "Op") }),
                 ("LiteralExpr", new() { ("object?", "Value") }),
+                ("LogicalExpr", new() { ("Expr", "Left"), ("Token", "Op"), ("Expr", "Right") }),
                 ("GroupingExpr", new() { ("Expr", "Expression") }),
                 ("TernaryConditionExpr", new() { ("Expr", "Condition"), ("Expr", "TrueExpr"), ("Expr", "FalseExpr") }),
                 ("VariableExpr", new() { ("Token", "Name") }),
