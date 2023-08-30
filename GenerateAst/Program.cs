@@ -32,6 +32,7 @@ namespace GenerateAst
                 ("PrintStmt", new() { ("Expr", "Expression") }),
                 ("VarStmt", new() { ("Token", "Name"), ("Expr?", "Initializer") }),
                 ("BlockStmt", new() { ("List<Stmt>", "Statements") }),
+                ("IfStmt", new() { ("Expr", "Condition"), ("Stmt", "ThenBranch"), ("Stmt?", "ElseBranch") })
             });
             var stmtFile = outputDir + "/" + "Stmt.cs";
             File.WriteAllText(stmtFile, stmtCode);

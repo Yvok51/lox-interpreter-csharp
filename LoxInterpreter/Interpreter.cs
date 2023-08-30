@@ -4,6 +4,19 @@
     {
         private Environment environment = new Environment();
 
+        public object? Visit(IfStmt visitee)
+        {
+            if (IsTruthy(Evaluate(visitee.Condition)))
+            {
+                Execute(visitee.ThenBranch);
+            }
+            else if (visitee.ElseBranch is not null)
+            {
+                Execute(visitee.ElseBranch);
+            }
+            return null;
+        }
+
         public void Interpret(List<Stmt> statements)
         {
             try

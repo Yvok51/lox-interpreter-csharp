@@ -50,8 +50,21 @@
         {
             if (Match(TokenType.PRINT)) return PrintStatement();
             if (Match(TokenType.LEFT_BRACE)) return new BlockStmt(Block());
+            if (Match(TokenType.IF)) return IfStatement();
 
             return ExpressionStatement();
+        }
+
+        private Stmt IfStatement()
+        {
+            Consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+            Expr condition = Expression();
+            Consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+            Stmt thenBranch = Statement();
+            Stmt? elseBranch = Match(TokenType.ELSE) ? Statement() : null;
+
+            return new IfStmt(condition, thenBranch, elseBranch);
         }
 
         private List<Stmt> Block()

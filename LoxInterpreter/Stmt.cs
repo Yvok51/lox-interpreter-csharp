@@ -6,6 +6,7 @@ namespace LoxInterpreter
      T Visit(PrintStmt visitee);
      T Visit(VarStmt visitee);
      T Visit(BlockStmt visitee);
+     T Visit(IfStmt visitee);
   }
 
   internal abstract class Stmt
@@ -56,6 +57,22 @@ namespace LoxInterpreter
       public BlockStmt(List<Stmt> statements)
       {
          Statements = statements;
+      }
+     public override T Accept<T>(IStmtVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class IfStmt : Stmt
+  {
+      public Expr Condition { get; }
+      public Stmt ThenBranch { get; }
+      public Stmt? ElseBranch { get; }
+      public IfStmt(Expr condition, Stmt thenbranch, Stmt? elsebranch)
+      {
+         Condition = condition;
+         ThenBranch = thenbranch;
+         ElseBranch = elsebranch;
       }
      public override T Accept<T>(IStmtVisitor<T> visitor)
       {
