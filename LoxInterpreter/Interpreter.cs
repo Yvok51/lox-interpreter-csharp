@@ -44,6 +44,12 @@
             return null;
         }
 
+        public object? Visit(BlockStmt visitee)
+        {
+            ExecuteBlock(visitee.Statements, new Environment(environment));
+            return null;
+        }
+
         public object? Visit(AssignExpr visitee)
         {
             object? value = Evaluate(visitee.Value);
@@ -146,6 +152,23 @@
         private void Execute(Stmt stmt)
         {
             stmt.Accept(this);
+        }
+
+        private void ExecuteBlock(List<Stmt> stmts, Environment environment)
+        {
+            var previousEnv = this.environment;
+            try
+            {
+                this.environment = environment;
+                foreach (var stmt in stmts)
+                {
+                    Execute(stmt);
+                }
+            }
+            finally
+            {
+                this.environment = previousEnv;
+            }
         }
 
         private string Stringify(object? value)
