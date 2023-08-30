@@ -21,13 +21,14 @@
 
         public object? Visit(VarStmt visitee)
         {
-            object? value = null;
             if (visitee.Initializer is not null)
             {
-                value = Evaluate(visitee.Initializer);
+                var value = Evaluate(visitee.Initializer);
+                environment.Define(visitee.Name.Lexeme, value);
+                return null;
             }
 
-            environment.Define(visitee.Name.Lexeme, value);
+            environment.Define(visitee.Name.Lexeme);
             return null;
         }
 
