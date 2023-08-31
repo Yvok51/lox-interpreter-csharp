@@ -8,6 +8,7 @@ namespace LoxInterpreter
      T Visit(BlockStmt visitee);
      T Visit(IfStmt visitee);
      T Visit(WhileStmt visitee);
+     T Visit(BreakStmt visitee);
   }
 
   internal abstract class Stmt
@@ -88,6 +89,16 @@ namespace LoxInterpreter
       {
          Condition = condition;
          Body = body;
+      }
+     public override T Accept<T>(IStmtVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class BreakStmt : Stmt
+  {
+      public BreakStmt()
+      {
       }
      public override T Accept<T>(IStmtVisitor<T> visitor)
       {

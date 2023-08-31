@@ -36,10 +36,10 @@
         {
             Token name = Consume(TokenType.IDENTIFIER, "Expect variable name.");
 
-            Expr initializer = null;
+            Expr? initializer = null;
             if (Match(TokenType.EQUAL))
             {
-                initializer = ExpressionList();
+                initializer = Expression();
             }
 
             Consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
@@ -53,8 +53,19 @@
             if (Match(TokenType.IF)) return IfStatement();
             if (Match(TokenType.WHILE)) return WhileStatement();
             if (Match(TokenType.FOR)) return ForStatement();
+            if (Match(TokenType.BREAK)) return BreakStatement();
 
             return ExpressionStatement();
+        }
+
+        private Stmt BreakStatement()
+        {
+            if (_loopDepth == 0)
+            {
+                Error(Previous(), "Break statement not allowed outside loops");
+            }
+            Consume(TokenType.SEMICOLON, "Expect ';' after break statement.");
+            return new BreakStmt();
         }
 
         private Stmt ForStatement()
@@ -67,22 +78,31 @@
             else initializer = ExpressionStatement();
 
             Expr condition = new LiteralExpr(true); // default empty condition
-            if (!Check(TokenType.SEMICOLON)) condition = ExpressionList();
+            if (!Check(TokenType.SEMICOLON)) condition = Expression();
             Consume(TokenType.SEMICOLON, "Expect ';' after loop condition");
 
             Expr? increment = null;
-            if (!Check(TokenType.RIGHT_PAREN)) increment = ExpressionList();
+            if (!Check(TokenType.RIGHT_PAREN)) increment = Expression();
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses");
 
-            Stmt body = Statement();
-
-            if (increment is not null)
+            try
             {
-                body = new BlockStmt(new() { body, new ExpressionStmt(increment) });
-            }
-            var loop = new WhileStmt(condition, body);
+                _loopDepth++;
+                Stmt body = Statement();
+                _loopDepth--;
 
-            return initializer is not null ? new BlockStmt(new() { initializer, loop }) : loop;
+                if (increment is not null)
+                {
+                    body = new BlockStmt(new() { body, new ExpressionStmt(increment) });
+                }
+                var loop = new WhileStmt(condition, body);
+
+                return initializer is not null ? new BlockStmt(new() { initializer, loop }) : loop;
+            }
+            finally
+            {
+                _loopDepth--;
+            }
         }
 
         private Stmt WhileStatement()
@@ -90,9 +110,17 @@
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
             Expr condition = Expression();
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after while condition.");
-            Stmt body = Statement();
+            try
+            {
+                _loopDepth++;
+                Stmt body = Statement();
 
-            return new WhileStmt(condition, body);
+                return new WhileStmt(condition, body);
+            }
+            finally
+            {
+                _loopDepth--;
+            }
         }
 
         private Stmt IfStatement()
@@ -120,25 +148,22 @@
 
         private Stmt PrintStatement()
         {
-            Expr expr = ExpressionList();
+            Expr expr = Expression();
             Consume(TokenType.SEMICOLON, "Expect ';' after value.");
             return new PrintStmt(expr);
         }
 
         private Stmt ExpressionStatement()
         {
-            Expr expr = ExpressionList();
+            Expr expr = Expression();
             Consume(TokenType.SEMICOLON, "Expect ';' after value.");
             return new ExpressionStmt(expr);
         }
 
-        private Expr ExpressionList() =>
-            LeftAssocBinaryWithLeadingCheck(Expression, TokenType.COMMA);
+        private Expr Expression() => Comma();
 
-        private Expr Expression()
-        {
-            return Assignment();
-        }
+        private Expr Comma() =>
+            LeftAssocBinaryWithLeadingCheck(Assignment, TokenType.COMMA);
 
         private Expr Assignment()
         {
@@ -165,7 +190,7 @@
             var condition = Or();
             if (Match(TokenType.QUESTION_MARK))
             {
-                var trueExpr = ExpressionList();
+                var trueExpr = Expression();
                 if (Match(TokenType.COLON))
                 {
                     var falseExpr = TernaryConditional();
@@ -320,6 +345,8 @@
 
         private readonly List<Token> _tokens;
         private int _position = 0;
+
+        private int _loopDepth = 0;
     }
 
     internal class ParseError : Exception { }

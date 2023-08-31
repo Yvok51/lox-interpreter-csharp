@@ -6,11 +6,20 @@
 
         public object? Visit(WhileStmt visitee)
         {
-            while (IsTruthy(Evaluate(visitee.Condition)))
+            try
             {
-                Execute(visitee.Body);
+                while (IsTruthy(Evaluate(visitee.Condition)))
+                {
+                    Execute(visitee.Body);
+                }
             }
+            catch (BreakException) { }
             return null;
+        }
+
+        public object? Visit(BreakStmt visitee)
+        {
+            throw new BreakException();
         }
 
         public object? Visit(IfStmt visitee)
@@ -255,4 +264,6 @@
             }
         }
     }
+
+    class BreakException : Exception { }
 }
