@@ -23,6 +23,7 @@ namespace GenerateAst
                 ("TernaryConditionExpr", new() { ("Expr", "Condition"), ("Expr", "TrueExpr"), ("Expr", "FalseExpr") }),
                 ("VariableExpr", new() { ("Token", "Name") }),
                 ("AssignExpr", new() { ("Token", "Name"), ("Expr", "Value") }),
+                ("CallExpr", new() {("Expr", "Callee"), ("Token", "Paren"), ("List<Expr>", "Arguments")}),
             });
             var exprFile = outputDir + "/" + "Expr.cs";
             File.WriteAllText(exprFile, exprCode);
@@ -36,6 +37,7 @@ namespace GenerateAst
                 ("IfStmt", new() { ("Expr", "Condition"), ("Stmt", "ThenBranch"), ("Stmt?", "ElseBranch") }),
                 ("WhileStmt", new() { ("Expr", "Condition"), ("Stmt", "Body")}),
                 ("BreakStmt", new() {}),
+                ("FunctionStmt", new() { ("Token", "Name"), ("List<Token>", "Parameters"), ("List<Stmt>", "Body")}),
             });
             var stmtFile = outputDir + "/" + "Stmt.cs";
             File.WriteAllText(stmtFile, stmtCode);

@@ -22,6 +22,7 @@
             try
             {
                 if (Match(TokenType.VAR)) return VarDeclaration();
+                if (Match(TokenType.FUN)) return Function("function");
 
                 return Statement();
             }
@@ -30,6 +31,29 @@
                 Synchronize();
                 return null;
             }
+        }
+
+        private Stmt Function(string kind)
+        {
+            Token name = Consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
+            Consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
+            List<Token> parameters = new();
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 arguments");
+                    }
+                    parameters.Add(Consume(TokenType.IDENTIFIER, "Expect parameter name."));
+                } while(Match(TokenType.COMMA));
+            }
+            Consume(TokenType.RIGHT_PAREN, "Exppect ')' after parameters");
+
+            Consume(TokenType.LEFT_BRACE, $"Expect '{{' before {kind} body");
+            var body = Block();
+            return new FunctionStmt(name, parameters, body);
         }
 
         private Stmt VarDeclaration()
@@ -229,7 +253,38 @@
                 return new UnaryExpr(right, op);
             }
 
-            return Primary();
+            return Call();
+        }
+
+        private Expr Call()
+        {
+            var expr = Primary();
+
+            while(Match(TokenType.LEFT_PAREN))
+            {
+                expr = FinishCall(expr);
+            }
+
+            return expr;
+        }
+
+        private Expr FinishCall(Expr callee)
+        {
+            List<Expr> args = new List<Expr>();
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (args.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 arguments");
+                    }
+                    args.Add(Assignment());
+                } while (Match(TokenType.COMMA));
+            }
+
+            Token paren = Consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+            return new CallExpr(callee, paren, args);
         }
 
         private Expr Primary()

@@ -50,6 +50,12 @@ namespace LoxInterpreter
             return Parenthesize(visitee.Op.Lexeme, visitee.Left, visitee.Right);
         }
 
+        public string Visit(CallExpr visitee)
+        {
+
+            return Parenthesize($"call {visitee.Callee.Accept(this)} with", visitee.Arguments.ToArray());
+        }
+
         private string Parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder builder = new StringBuilder();

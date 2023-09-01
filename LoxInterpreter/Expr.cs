@@ -10,6 +10,7 @@ namespace LoxInterpreter
      T Visit(TernaryConditionExpr visitee);
      T Visit(VariableExpr visitee);
      T Visit(AssignExpr visitee);
+     T Visit(CallExpr visitee);
   }
 
   internal abstract class Expr
@@ -122,6 +123,22 @@ namespace LoxInterpreter
       {
          Name = name;
          Value = value;
+      }
+     public override T Accept<T>(IExprVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class CallExpr : Expr
+  {
+      public Expr Callee { get; }
+      public Token Paren { get; }
+      public List<Expr> Arguments { get; }
+      public CallExpr(Expr callee, Token paren, List<Expr> arguments)
+      {
+         Callee = callee;
+         Paren = paren;
+         Arguments = arguments;
       }
      public override T Accept<T>(IExprVisitor<T> visitor)
       {

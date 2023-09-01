@@ -2,7 +2,23 @@
 {
     internal class Interpreter : IExprVisitor<object?>, IStmtVisitor<object?>
     {
-        private Environment environment = new Environment();
+        public readonly Environment Globals;
+        private Environment environment;
+
+        public Interpreter()
+        {
+            Globals = new Environment();
+            Globals.Define("clock", NativeFunctions.Clock);
+
+            environment = Globals;
+        }
+
+        public object? Visit(FunctionStmt visitee)
+        {
+            var function = new LoxFunction(visitee);
+            environment.Define(visitee.Name.Lexeme, function);
+            return null;
+        }
 
         public object? Visit(WhileStmt visitee)
         {
@@ -104,6 +120,26 @@
             return Evaluate(visitee.Right);
         }
 
+        public object? Visit(CallExpr visitee)
+        {
+            var callee = Evaluate(visitee.Callee);
+            List<object?> arguments = visitee.Arguments.Select(Evaluate).ToList();
+            if (callee is ILoxCallable function)
+            {
+                if (arguments.Count != function.Arity)
+                {
+                    throw new RuntimeError(
+                        visitee.Paren,
+                        $"Expected {function.Arity} arguments but got {arguments.Count}."
+                    );
+                }
+
+                return function.Call(this, arguments);
+            }
+
+            throw new RuntimeError(visitee.Paren, "Only functions and classes are callable.");
+        }
+
         public object? Visit(BinaryExpr visitee)
         {
             var left = Evaluate(visitee.Left);
@@ -201,7 +237,7 @@
             stmt.Accept(this);
         }
 
-        private void ExecuteBlock(List<Stmt> stmts, Environment environment)
+        public void ExecuteBlock(List<Stmt> stmts, Environment environment)
         {
             var previousEnv = this.environment;
             try
