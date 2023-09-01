@@ -33,6 +33,12 @@
             return null;
         }
 
+        public object? Visit(ReturnStmt visitee)
+        {
+            object? value = visitee.Value is not null ? Evaluate(visitee.Value) : null;
+            throw new ReturnException(value);
+        }
+
         public object? Visit(BreakStmt visitee)
         {
             throw new BreakException();
@@ -307,4 +313,13 @@
     }
 
     class BreakException : Exception { }
+
+    class ReturnException : Exception
+    {
+        public object? Value { get; }
+        public ReturnException(object? value) : base()
+        {
+            Value = value;
+        }
+    }
 }

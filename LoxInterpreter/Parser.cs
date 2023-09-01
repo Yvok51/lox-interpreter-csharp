@@ -78,8 +78,22 @@
             if (Match(TokenType.WHILE)) return WhileStatement();
             if (Match(TokenType.FOR)) return ForStatement();
             if (Match(TokenType.BREAK)) return BreakStatement();
+            if (Match(TokenType.RETURN)) return ReturnStatement();
 
             return ExpressionStatement();
+        }
+
+        private Stmt ReturnStatement()
+        {
+            Token keyword = Previous();
+            Expr? value = null;
+            if (!Check(TokenType.SEMICOLON))
+            {
+                value = Expression();
+            }
+
+            Consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+            return new ReturnStmt(keyword, value);
         }
 
         private Stmt BreakStatement()

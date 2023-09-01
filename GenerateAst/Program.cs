@@ -39,6 +39,7 @@ namespace GenerateAst
                 ("WhileStmt", new() { ("Expr", "Condition"), ("Stmt", "Body")}),
                 ("BreakStmt", new() {}),
                 ("FunctionStmt", new() { ("Token", "Name"), ("List<Token>", "Parameters"), ("List<Stmt>", "Body")}),
+                ("ReturnStmt", new() { ("Token", "Keyword"), ("Expr?", "Value") }),
             });
             var stmtFile = outputDir + "/" + "Stmt.cs";
             File.WriteAllText(stmtFile, stmtCode);

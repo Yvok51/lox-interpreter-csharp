@@ -25,8 +25,16 @@ namespace LoxInterpreter
                 environment.Define(declaration.Parameters[i].Lexeme, arguments[i]);
             }
 
-            interpreter.ExecuteBlock(declaration.Body, environment);
-            return null;
+            try
+            {
+                interpreter.ExecuteBlock(declaration.Body, environment);
+            }
+            catch (ReturnException e)
+            {
+                return e.Value;
+            }
+
+            return null; // default return value nil
         }
 
         public override string ToString()
