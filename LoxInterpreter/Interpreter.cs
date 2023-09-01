@@ -98,6 +98,11 @@
             return null;
         }
 
+        public object? Visit(EmptyStmt visitee)
+        {
+            return null;
+        }
+
         public object? Visit(AssignExpr visitee)
         {
             object? value = Evaluate(visitee.Value);

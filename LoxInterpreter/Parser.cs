@@ -29,7 +29,7 @@
             catch (ParseError)
             {
                 Synchronize();
-                return null;
+                return new EmptyStmt();
             }
         }
 

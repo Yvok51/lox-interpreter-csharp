@@ -30,6 +30,7 @@ namespace GenerateAst
 
             var stmtCode = DefineAst("Stmt", new()
             {
+                ("EmptyStmt", new() {}),
                 ("ExpressionStmt", new() { ("Expr", "Expression") }),
                 ("PrintStmt", new() { ("Expr", "Expression") }),
                 ("VarStmt", new() { ("Token", "Name"), ("Expr?", "Initializer") }),

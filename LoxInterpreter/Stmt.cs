@@ -2,6 +2,7 @@ namespace LoxInterpreter
 {
   internal interface IStmtVisitor<T>
   {
+     T Visit(EmptyStmt visitee);
      T Visit(ExpressionStmt visitee);
      T Visit(PrintStmt visitee);
      T Visit(VarStmt visitee);
@@ -15,6 +16,16 @@ namespace LoxInterpreter
   internal abstract class Stmt
   {
   public abstract T Accept<T>(IStmtVisitor<T> visitor);
+  }
+  internal class EmptyStmt : Stmt
+  {
+      public EmptyStmt()
+      {
+      }
+     public override T Accept<T>(IStmtVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
   }
   internal class ExpressionStmt : Stmt
   {
