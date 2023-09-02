@@ -50,6 +50,10 @@ namespace LoxInterpreter
             var statements = parser.Parse();
 
             if (_hadError) return;
+            
+            var resolver = new Resolver(interpreter);
+            resolver.Resolve(statements);
+
             interpreter.Interpret(statements);
         }
 

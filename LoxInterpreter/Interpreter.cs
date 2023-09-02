@@ -4,6 +4,7 @@
     {
         public readonly Environment Globals;
         private Environment environment;
+        private Dictionary<Expr, int> locals = new();
 
         public Interpreter()
         {
@@ -112,7 +113,16 @@
         public object? Visit(AssignExpr visitee)
         {
             object? value = Evaluate(visitee.Value);
-            environment.Assign(visitee.Name, value);
+
+            int distance = locals.GetValueOrDefault(visitee, -1);
+            if (distance > 0)
+            {
+                environment.AssignAt(distance, visitee.Name, value);
+            }
+            else
+            {
+                Globals.Assign(visitee.Name, value);
+            }
             return value;
         }
 
@@ -241,6 +251,21 @@
         {
             bool condition = IsTruthy(Evaluate(visitee.Condition));
             return condition ? Evaluate(visitee.TrueExpr) : Evaluate(visitee.FalseExpr);
+        }
+
+        public void Resolve(Expr expr, int depth)
+        {
+            locals.Add(expr, depth);
+        }
+
+        private object? LookupVariable(Token name, Expr expr)
+        {
+            int distance = locals.GetValueOrDefault(expr, -1);
+            if (distance > 0)
+            {
+                return environment.GetAt(distance, name.Lexeme);
+            }
+            return Globals.Get(name);
         }
 
         private object? Evaluate(Expr expr)
