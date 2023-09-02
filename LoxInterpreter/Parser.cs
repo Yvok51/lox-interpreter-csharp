@@ -85,12 +85,8 @@
 
         private Stmt BreakStatement()
         {
-            if (loopDepth == 0)
-            {
-                Error(Previous(), "Break statement not allowed outside loops");
-            }
             Consume(TokenType.SEMICOLON, "Expect ';' after break statement.");
-            return new BreakStmt();
+            return new BreakStmt(Previous());
         }
 
         private Stmt ForStatement()
@@ -110,24 +106,15 @@
             if (!Check(TokenType.RIGHT_PAREN)) increment = Expression();
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses");
 
-            try
-            {
-                loopDepth++;
-                Stmt body = Statement();
-                loopDepth--;
+            Stmt body = Statement();
 
-                if (increment is not null)
-                {
-                    body = new BlockStmt(new() { body, new ExpressionStmt(increment) });
-                }
-                var loop = new WhileStmt(condition, body);
-
-                return initializer is not null ? new BlockStmt(new() { initializer, loop }) : loop;
-            }
-            finally
+            if (increment is not null)
             {
-                loopDepth--;
+                body = new BlockStmt(new() { body, new ExpressionStmt(increment) });
             }
+            var loop = new WhileStmt(condition, body);
+
+            return initializer is not null ? new BlockStmt(new() { initializer, loop }) : loop;
         }
 
         private Stmt WhileStatement()
@@ -135,17 +122,9 @@
             Consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
             Expr condition = Expression();
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after while condition.");
-            try
-            {
-                loopDepth++;
-                Stmt body = Statement();
+            Stmt body = Statement();
 
-                return new WhileStmt(condition, body);
-            }
-            finally
-            {
-                loopDepth--;
-            }
+            return new WhileStmt(condition, body);
         }
 
         private Stmt IfStatement()
@@ -432,8 +411,6 @@
 
         private readonly List<Token> tokens;
         private int position = 0;
-
-        private int loopDepth = 0;
     }
 
     internal class ParseError : Exception { }

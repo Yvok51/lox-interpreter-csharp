@@ -21,6 +21,7 @@ namespace LoxInterpreter
         private readonly Interpreter interpreter;
         private readonly List<Dictionary<string, ResolvingState>> scopes = new();
         private FunctionType currentFunction = FunctionType.None;
+        private int loopDepth = 0;
 
         public Resolver(Interpreter interpreter)
         {
@@ -74,12 +75,18 @@ namespace LoxInterpreter
         public Null? Visit(WhileStmt visitee)
         {
             Resolve(visitee.Condition);
+            loopDepth++;
             Resolve(visitee.Body);
+            loopDepth--;
             return null;
         }
 
         public Null? Visit(BreakStmt visitee)
         {
+            if (loopDepth == 0)
+            {
+                Lox.Error(visitee.Keyword, "Break statement not allowed outside loops");
+            }
             return null;
         }
 

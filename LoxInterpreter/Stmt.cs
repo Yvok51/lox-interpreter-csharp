@@ -110,8 +110,10 @@ namespace LoxInterpreter
   }
   internal class BreakStmt : Stmt
   {
-      public BreakStmt()
+      public Token Keyword { get; }
+      public BreakStmt(Token keyword)
       {
+         Keyword = keyword;
       }
      public override T Accept<T>(IStmtVisitor<T> visitor)
       {

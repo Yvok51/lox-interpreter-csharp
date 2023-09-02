@@ -38,7 +38,7 @@ namespace GenerateAst
                 ("BlockStmt", new() { ("List<Stmt>", "Statements") }),
                 ("IfStmt", new() { ("Expr", "Condition"), ("Stmt", "ThenBranch"), ("Stmt?", "ElseBranch") }),
                 ("WhileStmt", new() { ("Expr", "Condition"), ("Stmt", "Body")}),
-                ("BreakStmt", new() {}),
+                ("BreakStmt", new() { ("Token", "Keyword" )}),
                 ("FunctionStmt", new() { ("Token", "Name"), ("FunExpr", "Function")}),
                 ("ReturnStmt", new() { ("Token", "Keyword"), ("Expr?", "Value") }),
             });
