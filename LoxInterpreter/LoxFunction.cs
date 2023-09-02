@@ -9,17 +9,19 @@ namespace LoxInterpreter
     internal class LoxFunction : ILoxCallable
     {
         private readonly FunctionStmt declaration;
+        private readonly Environment closure;
 
         public int Arity => declaration.Parameters.Count;
 
-        public LoxFunction(FunctionStmt declaration)
+        public LoxFunction(FunctionStmt declaration, Environment closure)
         {
+            this.closure = closure;
             this.declaration = declaration;
         }
 
         public object? Call(Interpreter interpreter, List<object?> arguments)
         {
-            Environment environment = new(interpreter.Globals);
+            Environment environment = new(closure);
             for (int i = 0; i < arguments.Count; i++)
             {
                 environment.Define(declaration.Parameters[i].Lexeme, arguments[i]);

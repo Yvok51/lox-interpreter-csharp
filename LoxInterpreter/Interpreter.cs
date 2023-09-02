@@ -15,7 +15,7 @@
 
         public object? Visit(FunctionStmt visitee)
         {
-            var function = new LoxFunction(visitee);
+            var function = new LoxFunction(visitee, environment);
             environment.Define(visitee.Name.Lexeme, function);
             return null;
         }
