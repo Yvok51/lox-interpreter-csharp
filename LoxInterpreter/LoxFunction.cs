@@ -8,13 +8,15 @@ namespace LoxInterpreter
 {
     internal class LoxFunction : ILoxCallable
     {
-        private readonly FunctionStmt declaration;
+        private readonly Token? name;
+        private readonly FunExpr declaration;
         private readonly Environment closure;
 
         public int Arity => declaration.Parameters.Count;
 
-        public LoxFunction(FunctionStmt declaration, Environment closure)
+        public LoxFunction(Token? name, FunExpr declaration, Environment closure)
         {
+            this.name = name;
             this.closure = closure;
             this.declaration = declaration;
         }
@@ -41,7 +43,7 @@ namespace LoxInterpreter
 
         public override string ToString()
         {
-            return $"<fn {declaration.Name.Lexeme}>";
+            return name is null ? "<fn>" : $"<fn {name.Lexeme}>";
         }
     }
 }

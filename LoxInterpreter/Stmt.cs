@@ -121,13 +121,11 @@ namespace LoxInterpreter
   internal class FunctionStmt : Stmt
   {
       public Token Name { get; }
-      public List<Token> Parameters { get; }
-      public List<Stmt> Body { get; }
-      public FunctionStmt(Token name, List<Token> parameters, List<Stmt> body)
+      public FunExpr Function { get; }
+      public FunctionStmt(Token name, FunExpr function)
       {
          Name = name;
-         Parameters = parameters;
-         Body = body;
+         Function = function;
       }
      public override T Accept<T>(IStmtVisitor<T> visitor)
       {
@@ -137,8 +135,8 @@ namespace LoxInterpreter
   internal class ReturnStmt : Stmt
   {
       public Token Keyword { get; }
-      public Expr Value { get; }
-      public ReturnStmt(Token keyword, Expr value)
+      public Expr? Value { get; }
+      public ReturnStmt(Token keyword, Expr? value)
       {
          Keyword = keyword;
          Value = value;

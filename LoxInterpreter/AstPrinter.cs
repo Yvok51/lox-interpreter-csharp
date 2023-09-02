@@ -56,6 +56,11 @@ namespace LoxInterpreter
             return Parenthesize($"call {visitee.Callee.Accept(this)} with", visitee.Arguments.ToArray());
         }
 
+        public string Visit(FunExpr visitee)
+        {
+            return Parenthesize("anonymous function");
+        }
+
         private string Parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder builder = new StringBuilder();

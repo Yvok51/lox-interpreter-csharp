@@ -22,7 +22,11 @@
             try
             {
                 if (Match(TokenType.VAR)) return VarDeclaration();
-                if (Match(TokenType.FUN)) return Function("function");
+                if (Check(TokenType.FUN) && CheckNext(TokenType.IDENTIFIER))
+                {
+                    Consume(TokenType.FUN, string.Empty);
+                    return Function("function");
+                }
 
                 return Statement();
             }
@@ -36,24 +40,7 @@
         private Stmt Function(string kind)
         {
             Token name = Consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
-            Consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
-            List<Token> parameters = new();
-            if (!Check(TokenType.RIGHT_PAREN))
-            {
-                do
-                {
-                    if (parameters.Count >= 255)
-                    {
-                        Error(Peek(), "Can't have more than 255 arguments");
-                    }
-                    parameters.Add(Consume(TokenType.IDENTIFIER, "Expect parameter name."));
-                } while(Match(TokenType.COMMA));
-            }
-            Consume(TokenType.RIGHT_PAREN, "Exppect ')' after parameters");
-
-            Consume(TokenType.LEFT_BRACE, $"Expect '{{' before {kind} body");
-            var body = Block();
-            return new FunctionStmt(name, parameters, body);
+            return new FunctionStmt(name, FunctionExpression(kind));
         }
 
         private Stmt VarDeclaration()
@@ -306,6 +293,7 @@
             if (Match(TokenType.FALSE)) return new LiteralExpr(false);
             if (Match(TokenType.TRUE)) return new LiteralExpr(true);
             if (Match(TokenType.NIL)) return new LiteralExpr(null);
+            if (Match(TokenType.FUN)) return FunctionExpression("function");
 
             if (Match(TokenType.NUMBER, TokenType.STRING))
             {
@@ -325,6 +313,29 @@
             }
 
             throw Error(Peek(), "Expect expression.");
+        }
+
+        private FunExpr FunctionExpression(string kind)
+        {
+            Consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
+            List<Token> parameters = new();
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 arguments");
+                    }
+                    parameters.Add(Consume(TokenType.IDENTIFIER, "Expect parameter name."));
+                } while (Match(TokenType.COMMA));
+            }
+            Consume(TokenType.RIGHT_PAREN, "Exppect ')' after parameters");
+
+            Consume(TokenType.LEFT_BRACE, $"Expect '{{' before {kind} body");
+            var body = Block();
+
+            return new FunExpr(parameters, body);
         }
 
         private Expr LeftAssocBinaryWithLeadingCheck(Func<Expr> operand, params TokenType[] operators)
@@ -396,6 +407,13 @@
                 }
             }
             return false;
+        }
+
+        private bool CheckNext(TokenType type)
+        {
+            if (IsAtEnd()) return false;
+            if (tokens[position + 1].Type == TokenType.EOF) return false;
+            return tokens[position + 1].Type == type;
         }
 
         private bool Check(TokenType type)

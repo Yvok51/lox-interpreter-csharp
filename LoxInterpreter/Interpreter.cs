@@ -15,7 +15,7 @@
 
         public object? Visit(FunctionStmt visitee)
         {
-            var function = new LoxFunction(visitee, environment);
+            var function = new LoxFunction(visitee.Name, visitee.Function, environment);
             environment.Define(visitee.Name.Lexeme, function);
             return null;
         }
@@ -149,6 +149,11 @@
             }
 
             throw new RuntimeError(visitee.Paren, "Only functions and classes are callable.");
+        }
+
+        public object? Visit(FunExpr visitee)
+        {
+            return new LoxFunction(null, visitee, environment);
         }
 
         public object? Visit(BinaryExpr visitee)

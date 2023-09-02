@@ -11,6 +11,7 @@ namespace LoxInterpreter
      T Visit(VariableExpr visitee);
      T Visit(AssignExpr visitee);
      T Visit(CallExpr visitee);
+     T Visit(FunExpr visitee);
   }
 
   internal abstract class Expr
@@ -139,6 +140,20 @@ namespace LoxInterpreter
          Callee = callee;
          Paren = paren;
          Arguments = arguments;
+      }
+     public override T Accept<T>(IExprVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class FunExpr : Expr
+  {
+      public List<Token> Parameters { get; }
+      public List<Stmt> Body { get; }
+      public FunExpr(List<Token> parameters, List<Stmt> body)
+      {
+         Parameters = parameters;
+         Body = body;
       }
      public override T Accept<T>(IExprVisitor<T> visitor)
       {
