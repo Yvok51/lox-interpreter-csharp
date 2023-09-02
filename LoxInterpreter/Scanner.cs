@@ -6,20 +6,20 @@ namespace LoxInterpreter
     {
         public Scanner(string text)
         {
-            _source = text;
-            _tokens = new List<Token>();
+            source = text;
+            tokens = new List<Token>();
         }
 
         public List<Token> ScanTokens()
         {
             while (!IsAtEnd())
             {
-                _start = _current;
+                start = current;
                 ScanToken();
             }
 
-            _tokens.Add(new Token(TokenType.EOF, "", _line, null));
-            return _tokens;
+            tokens.Add(new Token(TokenType.EOF, "", line, null));
+            return tokens;
         }
 
         private void ScanToken()
@@ -70,7 +70,7 @@ namespace LoxInterpreter
                 case ' ':
                 case '\r':
                 case '\t': break; // Ignore whitespace
-                case '\n': _line++; break;
+                case '\n': line++; break;
 
                 case '"': String(); break;
                 case >= '0' and <= '9': Number(); break;
@@ -82,7 +82,7 @@ namespace LoxInterpreter
                     }
                     else
                     {
-                        Lox.Error(_line, "Unexpected character.");
+                        Lox.Error(line, "Unexpected character.");
                     }
                     break;
             }
@@ -113,18 +113,18 @@ namespace LoxInterpreter
         {
             while (Peek() != '"' && !IsAtEnd())
             {
-                if (Peek() == '\n') _line++;
+                if (Peek() == '\n') line++;
                 Advance();
             }
 
             if (IsAtEnd())
             {
-                Lox.Error(_line, "Unterminated string.");
+                Lox.Error(line, "Unterminated string.");
                 return;
             }
 
             Advance(); // Closing "
-            var value = _source.Substring(_start + 1, CurrentLength() - 2); // value inside quotes
+            var value = source.Substring(start + 1, CurrentLength() - 2); // value inside quotes
             AddToken(TokenType.STRING, value);
         }
 
@@ -158,7 +158,7 @@ namespace LoxInterpreter
 
         private char Advance()
         {
-            return _source[_current++];
+            return source[current++];
         }
 
         private void AddToken(TokenType type)
@@ -169,40 +169,40 @@ namespace LoxInterpreter
         private void AddToken(TokenType type, object? literal)
         {
             string text = CurrentToken();
-            _tokens.Add(new Token(type, text, _line, literal));
+            tokens.Add(new Token(type, text, line, literal));
         }
 
-        private string CurrentToken() => _source.Substring(_start, CurrentLength());
+        private string CurrentToken() => source.Substring(start, CurrentLength());
 
-        private bool IsAtEnd() => _current >= _source.Length;
+        private bool IsAtEnd() => current >= source.Length;
 
-        private int CurrentLength() => _current - _start;
+        private int CurrentLength() => current - start;
 
         private bool Match(char expected)
         {
             if (Peek() != expected) return false;
 
-            _current++;
+            current++;
             return true;
         }
 
         private char Peek()
         {
-            return IsAtEnd() ? '\0' : _source[_current];
+            return IsAtEnd() ? '\0' : source[current];
         }
 
         private char PeekNext()
         {
-            if (_current + 1 >= _source.Length) return '\0';
-            return _source[_current + 1];
+            if (current + 1 >= source.Length) return '\0';
+            return source[current + 1];
         }
 
-        private readonly string _source;
-        private readonly List<Token> _tokens;
+        private readonly string source;
+        private readonly List<Token> tokens;
 
-        private int _start = 0;
-        private int _current = 0;
-        private int _line = 1;
+        private int start = 0;
+        private int current = 0;
+        private int line = 1;
 
         private static readonly Dictionary<string, TokenType> keywords = new()
         {

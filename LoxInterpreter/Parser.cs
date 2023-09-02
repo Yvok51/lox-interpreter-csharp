@@ -4,7 +4,7 @@
     {
         public Parser(List<Token> tokens)
         {
-            _tokens = tokens;
+            this.tokens = tokens;
         }
 
         public List<Stmt> Parse()
@@ -98,7 +98,7 @@
 
         private Stmt BreakStatement()
         {
-            if (_loopDepth == 0)
+            if (loopDepth == 0)
             {
                 Error(Previous(), "Break statement not allowed outside loops");
             }
@@ -125,9 +125,9 @@
 
             try
             {
-                _loopDepth++;
+                loopDepth++;
                 Stmt body = Statement();
-                _loopDepth--;
+                loopDepth--;
 
                 if (increment is not null)
                 {
@@ -139,7 +139,7 @@
             }
             finally
             {
-                _loopDepth--;
+                loopDepth--;
             }
         }
 
@@ -150,14 +150,14 @@
             Consume(TokenType.RIGHT_PAREN, "Expect ')' after while condition.");
             try
             {
-                _loopDepth++;
+                loopDepth++;
                 Stmt body = Statement();
 
                 return new WhileStmt(condition, body);
             }
             finally
             {
-                _loopDepth--;
+                loopDepth--;
             }
         }
 
@@ -405,17 +405,17 @@
         }
         private Token Advance() 
         {
-            if (!IsAtEnd()) _position++;
+            if (!IsAtEnd()) position++;
             return Previous();
         }
         private bool IsAtEnd() => Peek().Type == TokenType.EOF;
-        private Token Peek() => _tokens[_position];
-        private Token Previous() => _tokens[_position - 1];
+        private Token Peek() => tokens[position];
+        private Token Previous() => tokens[position - 1];
 
-        private readonly List<Token> _tokens;
-        private int _position = 0;
+        private readonly List<Token> tokens;
+        private int position = 0;
 
-        private int _loopDepth = 0;
+        private int loopDepth = 0;
     }
 
     internal class ParseError : Exception { }
