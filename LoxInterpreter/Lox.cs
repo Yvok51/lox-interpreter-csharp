@@ -89,4 +89,6 @@ namespace LoxInterpreter
         private static bool _hadRuntimeError = false;
         private static readonly Interpreter interpreter = new();
     }
+
+    internal class Null { }
 }

@@ -1,6 +1,6 @@
 ﻿namespace LoxInterpreter
 {
-    internal class Interpreter : IExprVisitor<object?>, IStmtVisitor<object?>
+    internal class Interpreter : IExprVisitor<object?>, IStmtVisitor<Null?>
     {
         public readonly Environment Globals;
         private Environment environment;
@@ -13,14 +13,14 @@
             environment = Globals;
         }
 
-        public object? Visit(FunctionStmt visitee)
+        public Null? Visit(FunctionStmt visitee)
         {
             var function = new LoxFunction(visitee.Name, visitee.Function, environment);
             environment.Define(visitee.Name.Lexeme, function);
             return null;
         }
 
-        public object? Visit(WhileStmt visitee)
+        public Null? Visit(WhileStmt visitee)
         {
             try
             {
@@ -33,18 +33,18 @@
             return null;
         }
 
-        public object? Visit(ReturnStmt visitee)
+        public Null? Visit(ReturnStmt visitee)
         {
             object? value = visitee.Value is not null ? Evaluate(visitee.Value) : null;
             throw new ReturnException(value);
         }
 
-        public object? Visit(BreakStmt visitee)
+        public Null? Visit(BreakStmt visitee)
         {
             throw new BreakException();
         }
 
-        public object? Visit(IfStmt visitee)
+        public Null? Visit(IfStmt visitee)
         {
             if (IsTruthy(Evaluate(visitee.Condition)))
             {
@@ -72,7 +72,7 @@
             }
         }
 
-        public object? Visit(VarStmt visitee)
+        public Null? Visit(VarStmt visitee)
         {
             if (visitee.Initializer is not null)
             {
@@ -85,26 +85,26 @@
             return null;
         }
 
-        public object? Visit(ExpressionStmt visitee)
+        public Null? Visit(ExpressionStmt visitee)
         {
             Evaluate(visitee.Expression);
             return null;
         }
 
-        public object? Visit(PrintStmt visitee)
+        public Null? Visit(PrintStmt visitee)
         {
             var val = Evaluate(visitee.Expression);
             Console.WriteLine(Stringify(val));
             return null;
         }
 
-        public object? Visit(BlockStmt visitee)
+        public Null? Visit(BlockStmt visitee)
         {
             ExecuteBlock(visitee.Statements, new Environment(environment));
             return null;
         }
 
-        public object? Visit(EmptyStmt visitee)
+        public Null? Visit(EmptyStmt visitee)
         {
             return null;
         }
