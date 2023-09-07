@@ -109,6 +109,13 @@ namespace LoxInterpreter
             return null;
         }
 
+        public Null? Visit(ClassStmt visitee)
+        {
+            Declare(visitee.Name);
+            Define(visitee.Name);
+            return null;
+        }
+
         public Null? Visit(BinaryExpr visitee)
         {
             Resolve(visitee.Left);
@@ -173,6 +180,19 @@ namespace LoxInterpreter
             {
                 Resolve(arg);
             }
+            return null;
+        }
+
+        public Null? Visit(GetExpr visitee)
+        {
+            Resolve(visitee.Instance);
+            return null;
+        }
+
+        public Null? Visit(SetExpr visitee)
+        {
+            Resolve(visitee.Value);
+            Resolve(visitee.Instance);
             return null;
         }
 

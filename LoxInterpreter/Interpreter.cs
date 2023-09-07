@@ -14,6 +14,14 @@
             environment = Globals;
         }
 
+        public Null? Visit(ClassStmt visitee)
+        {
+            environment.Define(visitee.Name.Lexeme);
+            var @class = new LoxClass(visitee.Name.Lexeme);
+            environment.Assign(visitee.Name, @class);
+            return null;
+        }
+
         public Null? Visit(FunctionStmt visitee)
         {
             var function = new LoxFunction(visitee.Name, visitee.Function, environment);
@@ -159,6 +167,30 @@
             }
 
             throw new RuntimeError(visitee.Paren, "Only functions and classes are callable.");
+        }
+
+        public object? Visit(GetExpr visitee)
+        {
+            var @object = Evaluate(visitee.Instance);
+            if (@object is LoxInstance instance)
+            {
+                return instance.Get(visitee.Property);
+            }
+
+            throw new RuntimeError(visitee.Property, "Only instances have properties.");
+        }
+
+        public object? Visit(SetExpr visitee)
+        {
+            var @object = Evaluate(visitee.Instance);
+            if (@object is LoxInstance instance)
+            {
+                var value = Evaluate(visitee.Value);
+                instance.Set(visitee.Property, value);
+                return value;
+            }
+
+            throw new RuntimeError(visitee.Property, "Only instances have fields.");
         }
 
         public object? Visit(FunExpr visitee)

@@ -27,6 +27,7 @@
                     Consume(TokenType.FUN, string.Empty);
                     return Function("function");
                 }
+                if (Match(TokenType.CLASS)) return ClassDeclaration();
 
                 return Statement();
             }
@@ -37,7 +38,21 @@
             }
         }
 
-        private Stmt Function(string kind)
+        private Stmt ClassDeclaration()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect class name.");
+            Consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+            List<FunctionStmt> methods = new List<FunctionStmt>();
+            while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+            {
+                methods.Add(Function("method"));
+            }
+
+            Consume(TokenType.LEFT_BRACE, "Expect '}' after class body.");
+            return new ClassStmt(name, methods);
+        }
+
+        private FunctionStmt Function(string kind)
         {
             Token name = Consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
             return new FunctionStmt(name, FunctionExpression(kind));
@@ -178,9 +193,14 @@
                 Token equals = Previous();
                 Expr value = Assignment();
 
-                if (expr is VariableExpr varExpr) {
+                if (expr is VariableExpr varExpr)
+                {
                     Token name = varExpr.Name;
                     return new AssignExpr(name, value);
+                }
+                if (expr is GetExpr getExpr)
+                {
+                    return new SetExpr(getExpr.Instance, getExpr.Property, value);
                 }
 
                 Error(equals, "Invalid assignment target.");
@@ -240,9 +260,18 @@
         {
             var expr = Primary();
 
-            while(Match(TokenType.LEFT_PAREN))
+            while(true)
             {
-                expr = FinishCall(expr);
+                if (Match(TokenType.LEFT_PAREN))
+                {
+                    expr = FinishCall(expr);
+                }
+                else if (Match(TokenType.DOT))
+                {
+                    Token property = Consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
+                    expr = new GetExpr(expr, property);
+                }
+                else break;
             }
 
             return expr;

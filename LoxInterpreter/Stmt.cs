@@ -12,6 +12,7 @@ namespace LoxInterpreter
      T Visit(BreakStmt visitee);
      T Visit(FunctionStmt visitee);
      T Visit(ReturnStmt visitee);
+     T Visit(ClassStmt visitee);
   }
 
   internal abstract class Stmt
@@ -142,6 +143,20 @@ namespace LoxInterpreter
       {
          Keyword = keyword;
          Value = value;
+      }
+     public override T Accept<T>(IStmtVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class ClassStmt : Stmt
+  {
+      public Token Name { get; }
+      public List<FunctionStmt> Methods { get; }
+      public ClassStmt(Token name, List<FunctionStmt> methods)
+      {
+         Name = name;
+         Methods = methods;
       }
      public override T Accept<T>(IStmtVisitor<T> visitor)
       {

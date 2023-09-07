@@ -61,6 +61,16 @@ namespace LoxInterpreter
             return Parenthesize("anonymous function");
         }
 
+        public string Visit(GetExpr visitee)
+        {
+            return Parenthesize($"get {visitee.Property} of", visitee.Instance);
+        }
+
+        public string Visit(SetExpr visitee)
+        {
+            return Parenthesize($"set {visitee.Property} of", visitee.Instance, visitee.Value);
+        }
+
         private string Parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder builder = new StringBuilder();

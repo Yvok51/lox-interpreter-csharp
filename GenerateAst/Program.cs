@@ -24,7 +24,9 @@ namespace GenerateAst
                 ("VariableExpr", new() { ("Token", "Name") }),
                 ("AssignExpr", new() { ("Token", "Name"), ("Expr", "Value") }),
                 ("CallExpr", new() {("Expr", "Callee"), ("Token", "Paren"), ("List<Expr>", "Arguments")}),
-                ("FunExpr", new() {("List<Token>", "Parameters"), ("List<Stmt>", "Body")})
+                ("FunExpr", new() {("List<Token>", "Parameters"), ("List<Stmt>", "Body")}),
+                ("GetExpr", new() { ("Expr", "Instance"), ("Token", "Property") }),
+                ("SetExpr", new() { ("Expr", "Instance"), ("Token", "Property"), ("Expr", "Value") }),
             });
             var exprFile = outputDir + "/" + "Expr.cs";
             File.WriteAllText(exprFile, exprCode);
@@ -41,6 +43,7 @@ namespace GenerateAst
                 ("BreakStmt", new() { ("Token", "Keyword" )}),
                 ("FunctionStmt", new() { ("Token", "Name"), ("FunExpr", "Function")}),
                 ("ReturnStmt", new() { ("Token", "Keyword"), ("Expr?", "Value") }),
+                ("ClassStmt", new() { ("Token", "Name"), ("List<FunctionStmt>", "Methods") }),
             });
             var stmtFile = outputDir + "/" + "Stmt.cs";
             File.WriteAllText(stmtFile, stmtCode);
