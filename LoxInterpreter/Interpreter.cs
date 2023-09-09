@@ -278,7 +278,12 @@
 
         public object? Visit(VariableExpr visitee)
         {
-            return environment.Get(visitee.Name);
+            return LookupVariable(visitee.Name, visitee);
+        }
+
+        public object? Visit(ThisExpr visitee)
+        {
+            return LookupVariable(visitee.Keyword, visitee);
         }
 
         public object? Visit(GroupingExpr visitee)

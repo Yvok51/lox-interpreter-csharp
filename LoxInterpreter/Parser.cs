@@ -302,6 +302,7 @@
             if (Match(TokenType.TRUE)) return new LiteralExpr(true);
             if (Match(TokenType.NIL)) return new LiteralExpr(null);
             if (Match(TokenType.FUN)) return FunctionExpression("function");
+            if (Match(TokenType.THIS)) return new ThisExpr(Previous());
 
             if (Match(TokenType.NUMBER, TokenType.STRING))
             {

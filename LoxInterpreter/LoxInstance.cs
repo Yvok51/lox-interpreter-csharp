@@ -20,7 +20,7 @@
 
             if (@class.TryFindMethod(property.Lexeme, out var method))
             {
-                return method;
+                return method.Bind(this);
             }
 
             throw new RuntimeError(property, $"Undefined property '{property.Lexeme}'.");

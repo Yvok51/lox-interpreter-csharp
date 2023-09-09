@@ -16,11 +16,17 @@ namespace LoxInterpreter
         None, Function, Method
     }
 
+    internal enum ClassType
+    {
+        None, Class
+    }
+
     internal class Resolver : IExprVisitor<Null?>, IStmtVisitor<Null?>
     {
         private readonly Interpreter interpreter;
         private readonly List<Dictionary<string, ResolvingState>> scopes = new();
         private FunctionType currentFunction = FunctionType.None;
+        private ClassType currentClass = ClassType.None;
         private int loopDepth = 0;
 
         public Resolver(Interpreter interpreter)
@@ -114,10 +120,20 @@ namespace LoxInterpreter
             Declare(visitee.Name);
             Define(visitee.Name);
 
+            ClassType lastClassType = currentClass;
+            currentClass = ClassType.Class;
+
+            BeginScope();
+            scopes.Last().Add("this", ResolvingState.Resolved);
+
             foreach (var method in visitee.Methods)
             {
                 ResolveFunction(method.Function, FunctionType.Method);
             }
+
+            EndScope();
+
+            currentClass = lastClassType;
 
             return null;
         }
@@ -137,6 +153,16 @@ namespace LoxInterpreter
 
         public Null? Visit(LiteralExpr visitee)
         {
+            return null;
+        }
+
+        public Null? Visit(ThisExpr visitee)
+        {
+            if (currentClass == ClassType.None)
+            {
+                Lox.Error(visitee.Keyword, "Can't use 'this' outside of a class.");
+            }
+            ResolveLocal(visitee, visitee.Keyword);
             return null;
         }
 

@@ -71,6 +71,11 @@ namespace LoxInterpreter
             return Parenthesize($"set {visitee.Property} of", visitee.Instance, visitee.Value);
         }
 
+        public string Visit(ThisExpr visitee)
+        {
+            return visitee.Keyword.Lexeme;
+        }
+
         private string Parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder builder = new StringBuilder();

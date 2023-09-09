@@ -14,6 +14,7 @@ namespace LoxInterpreter
      T Visit(FunExpr visitee);
      T Visit(GetExpr visitee);
      T Visit(SetExpr visitee);
+     T Visit(ThisExpr visitee);
   }
 
   internal abstract class Expr
@@ -186,6 +187,18 @@ namespace LoxInterpreter
          Instance = instance;
          Property = property;
          Value = value;
+      }
+     public override T Accept<T>(IExprVisitor<T> visitor)
+      {
+          return visitor.Visit(this);
+      }
+  }
+  internal class ThisExpr : Expr
+  {
+      public Token Keyword { get; }
+      public ThisExpr(Token keyword)
+      {
+         Keyword = keyword;
       }
      public override T Accept<T>(IExprVisitor<T> visitor)
       {

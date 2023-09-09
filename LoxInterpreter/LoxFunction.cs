@@ -41,6 +41,13 @@ namespace LoxInterpreter
             return null; // default return value nil
         }
 
+        public LoxFunction Bind(LoxInstance instance)
+        {
+            Environment environment = new(closure);
+            environment.Define("this", instance);
+            return new LoxFunction(name, declaration, environment);
+        }
+
         public override string ToString()
         {
             return name is null ? "<fn>" : $"<fn {name.Lexeme}>";
