@@ -202,7 +202,7 @@ namespace LoxInterpreter
             return null;
         }
 
-        private bool InGlobalScope => scopes.Count > 0;
+        private bool InGlobalScope => scopes.Count == 0;
 
         private void ResolveFunction(FunExpr function, FunctionType functionType)
         {
