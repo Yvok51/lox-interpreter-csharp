@@ -13,7 +13,7 @@ namespace LoxInterpreter
 
     internal enum FunctionType
     {
-        None, Function
+        None, Function, Method
     }
 
     internal class Resolver : IExprVisitor<Null?>, IStmtVisitor<Null?>
@@ -113,6 +113,12 @@ namespace LoxInterpreter
         {
             Declare(visitee.Name);
             Define(visitee.Name);
+
+            foreach (var method in visitee.Methods)
+            {
+                ResolveFunction(method.Function, FunctionType.Method);
+            }
+
             return null;
         }
 

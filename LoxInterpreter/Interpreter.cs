@@ -17,7 +17,14 @@
         public Null? Visit(ClassStmt visitee)
         {
             environment.Define(visitee.Name.Lexeme);
-            var @class = new LoxClass(visitee.Name.Lexeme);
+
+            Dictionary<string, LoxFunction> methods = new();
+            foreach (var method in visitee.Methods)
+            {
+                methods.Add(method.Name.Lexeme, new LoxFunction(method.Name, method.Function, environment));
+            }
+
+            var @class = new LoxClass(visitee.Name.Lexeme, methods);
             environment.Assign(visitee.Name, @class);
             return null;
         }

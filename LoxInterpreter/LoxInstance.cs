@@ -17,6 +17,12 @@
             {
                 return fields[property.Lexeme];
             }
+
+            if (@class.TryFindMethod(property.Lexeme, out var method))
+            {
+                return method;
+            }
+
             throw new RuntimeError(property, $"Undefined property '{property.Lexeme}'.");
         }
 

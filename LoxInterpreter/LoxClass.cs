@@ -3,9 +3,12 @@
     internal class LoxClass : ILoxCallable
     {
         private readonly string name;
-        public LoxClass(string name)
+        private readonly Dictionary<string, LoxFunction> methods;
+
+        public LoxClass(string name, Dictionary<string, LoxFunction> methods)
         {
             this.name = name;
+            this.methods = methods;
         }
 
         public int Arity => 0;
@@ -14,6 +17,11 @@
         {
             var instance = new LoxInstance(this);
             return instance;
+        }
+
+        public bool TryFindMethod(string name, out LoxFunction method)
+        {
+            return methods.TryGetValue(name, out method);
         }
 
         public override string ToString()
