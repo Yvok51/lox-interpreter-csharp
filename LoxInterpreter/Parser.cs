@@ -48,7 +48,7 @@
                 methods.Add(Function("method"));
             }
 
-            Consume(TokenType.LEFT_BRACE, "Expect '}' after class body.");
+            Consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
             return new ClassStmt(name, methods);
         }
 
