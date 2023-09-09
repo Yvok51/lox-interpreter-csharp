@@ -1,0 +1,8 @@
+﻿class Dog {
+    bark() {
+        print "Haf";
+    }
+}
+
+var dog = Dog();
+print dog;
