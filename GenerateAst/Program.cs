@@ -27,6 +27,7 @@ namespace GenerateAst
                 ("FunExpr", new() {("List<Token>", "Parameters"), ("List<Stmt>", "Body")}),
                 ("GetExpr", new() { ("Expr", "Instance"), ("Token", "Property") }),
                 ("SetExpr", new() { ("Expr", "Instance"), ("Token", "Property"), ("Expr", "Value") }),
+                ("ThisExpr", new() { ("Token", "Keyword") }),
             });
             var exprFile = outputDir + "/" + "Expr.cs";
             File.WriteAllText(exprFile, exprCode);

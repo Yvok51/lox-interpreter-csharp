@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LoxInterpreter
+﻿namespace LoxInterpreter
 {
     internal class LoxFunction : ILoxCallable
     {
         private readonly Token? name;
         private readonly FunExpr declaration;
         private readonly Environment closure;
+        private readonly bool isInitializer;
 
         public int Arity => declaration.Parameters.Count;
 
-        public LoxFunction(Token? name, FunExpr declaration, Environment closure)
+        public LoxFunction(Token? name, FunExpr declaration, Environment closure, bool isInitializer)
         {
             this.name = name;
             this.closure = closure;
             this.declaration = declaration;
+            this.isInitializer = isInitializer;
         }
 
         public object? Call(Interpreter interpreter, List<object?> arguments)
@@ -35,17 +31,17 @@ namespace LoxInterpreter
             }
             catch (ReturnException e)
             {
-                return e.Value;
+                return isInitializer ? closure.GetAt(0, "this") : e.Value;
             }
 
-            return null; // default return value nil
+            return isInitializer ? closure.GetAt(0, "this") : null; // default return value nil
         }
 
         public LoxFunction Bind(LoxInstance instance)
         {
             Environment environment = new(closure);
             environment.Define("this", instance);
-            return new LoxFunction(name, declaration, environment);
+            return new LoxFunction(name, declaration, environment, isInitializer);
         }
 
         public override string ToString()

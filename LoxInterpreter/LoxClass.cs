@@ -11,11 +11,19 @@
             this.methods = methods;
         }
 
-        public int Arity => 0;
+        public int Arity { get
+            {
+                return TryFindMethod("init", out var constructor) ? constructor.Arity : 0;
+            }
+        }
 
         public object? Call(Interpreter interpreter, List<object?> arguments)
         {
             var instance = new LoxInstance(this);
+            if (TryFindMethod("init", out var constructor))
+            {
+                constructor.Bind(instance).Call(interpreter, arguments);
+            }
             return instance;
         }
 

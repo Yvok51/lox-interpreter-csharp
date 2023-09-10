@@ -21,7 +21,7 @@
             Dictionary<string, LoxFunction> methods = new();
             foreach (var method in visitee.Methods)
             {
-                methods.Add(method.Name.Lexeme, new LoxFunction(method.Name, method.Function, environment));
+                methods.Add(method.Name.Lexeme, new LoxFunction(method.Name, method.Function, environment, method.Name.Lexeme == "init"));
             }
 
             var @class = new LoxClass(visitee.Name.Lexeme, methods);
@@ -31,7 +31,7 @@
 
         public Null? Visit(FunctionStmt visitee)
         {
-            var function = new LoxFunction(visitee.Name, visitee.Function, environment);
+            var function = new LoxFunction(visitee.Name, visitee.Function, environment, false);
             environment.Define(visitee.Name.Lexeme, function);
             return null;
         }
@@ -183,7 +183,6 @@
             {
                 return instance.Get(visitee.Property);
             }
-
             throw new RuntimeError(visitee.Property, "Only instances have properties.");
         }
 
@@ -202,7 +201,7 @@
 
         public object? Visit(FunExpr visitee)
         {
-            return new LoxFunction(null, visitee, environment);
+            return new LoxFunction(null, visitee, environment, false);
         }
 
         public object? Visit(BinaryExpr visitee)

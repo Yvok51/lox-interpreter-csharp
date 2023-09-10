@@ -1,28 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LoxInterpreter
+﻿namespace LoxInterpreter
 {
-    internal enum ResolvingState
-    {
-        Resolving, Resolved, None
-    }
-
-    internal enum FunctionType
-    {
-        None, Function, Method
-    }
-
-    internal enum ClassType
-    {
-        None, Class
-    }
-
     internal class Resolver : IExprVisitor<Null?>, IStmtVisitor<Null?>
     {
+        internal enum ResolvingState
+        {
+            Resolving, Resolved, None
+        }
+
+        internal enum FunctionType
+        {
+            None, Function, Method, Initializer
+        }
+
+        internal enum ClassType
+        {
+            None, Class
+        }
+
         private readonly Interpreter interpreter;
         private readonly List<Dictionary<string, ResolvingState>> scopes = new();
         private FunctionType currentFunction = FunctionType.None;
@@ -111,7 +105,16 @@ namespace LoxInterpreter
             {
                 Lox.Error(visitee.Keyword, "Can't return from top-level code.");
             }
-            if (visitee.Value is not null) Resolve(visitee.Value);
+            if (currentFunction == FunctionType.Initializer && visitee.Value is not null)
+            {
+                Lox.Error(visitee.Keyword, "Can't return a value from an initializer.");
+            }
+
+            if (visitee.Value is not null)
+            {
+                Resolve(visitee.Value);
+            }
+
             return null;
         }
 
@@ -124,11 +127,11 @@ namespace LoxInterpreter
             currentClass = ClassType.Class;
 
             BeginScope();
-            scopes.Last().Add("this", ResolvingState.Resolved);
+            Define("this");
 
             foreach (var method in visitee.Methods)
             {
-                ResolveFunction(method.Function, FunctionType.Method);
+                ResolveFunction(method.Function, method.Name.Lexeme == "init" ? FunctionType.Initializer : FunctionType.Method);
             }
 
             EndScope();
@@ -276,8 +279,13 @@ namespace LoxInterpreter
 
         private void Define(Token name)
         {
+            Define(name.Lexeme);
+        }
+
+        private void Define(string name)
+        {
             if (scopes.Count == 0) return;
-            scopes.Last()[name.Lexeme] = ResolvingState.Resolved;
+            scopes.Last()[name] = ResolvingState.Resolved;
         }
 
         private void BeginScope()
