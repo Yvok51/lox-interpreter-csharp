@@ -305,7 +305,7 @@
         private object? LookupVariable(Token name, Expr expr)
         {
             int distance = locals.GetValueOrDefault(expr, -1);
-            if (distance > 0)
+            if (distance >= 0)
             {
                 return environment.GetAt(distance, name.Lexeme);
             }
