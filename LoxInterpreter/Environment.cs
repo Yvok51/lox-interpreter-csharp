@@ -48,7 +48,8 @@
 
         public object? GetAt(int distance, string name)
         {
-            return Ancestor(distance).values[name];
+            var (_, value) = Ancestor(distance).values[name];
+            return value;
         }
 
         public Environment Ancestor(int distance)
