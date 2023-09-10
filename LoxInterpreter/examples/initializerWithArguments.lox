@@ -1,0 +1,8 @@
+﻿class Person {
+    init(name) {
+        this.name = name;
+    }
+}
+
+var michael = Person("Michael");
+print michael.name;

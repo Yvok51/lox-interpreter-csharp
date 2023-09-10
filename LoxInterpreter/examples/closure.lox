@@ -1,0 +1,10 @@
+﻿var food = "eggs";
+fun printTodaysBreakfast() {
+    print food + " with a sandwich";
+}
+
+printTodaysBreakfast();
+
+food = "cereal";
+
+printTodaysBreakfast();

@@ -1,0 +1,9 @@
+﻿class Person {
+    sayName() {
+        print this.name;
+    }
+}
+
+var michael = Person();
+michael.name = "Michael";
+michael.sayName();
